@@ -2,10 +2,10 @@ import hexchat
 import random
 
 __module_name__ = 'Blackjack'
-__module_version__ = '0.2.5'
+__module_version__ = '0.3.0'
 __module_description__ = 'A Blackjack Bot Plugin'
 __module_author__ = 'Vlek'
-__module_website__ = 'https://github.com/Vlek/HexChat/addons/Blackjack'
+__module_website__ = 'https://github.com/Vlek/plugins/blob/master/HexChat/Blackjack.py'
 
 _decks = 2
 _blackjackstats = {}
@@ -13,11 +13,9 @@ _blackjackstats = {}
 
 def say(msg):
     """Says msg in chat within current context"""
-    context = hexchat.find_context()
-    print( context.get_info('channel') )
-    print( context.get_info('server') )
-    context.command('say {}'.format(msg))
-    return
+    context = hexchat.get_context()
+    context.command('say ' + msg)
+    
 
 class BlackjackStatistics:
     """Class used to house a single player's blackjack statistics"""
@@ -33,9 +31,7 @@ class BlackjackStatistics:
 class PokerGame:
     def __init__(self, user):
         self.suits = ['hearts', 'clubs', 'diamonds', 'spades']
-        #self.suitSymbols = {'hearts': u"\u2661", 'clubs': u"\u2663", 'diamonds': u"\u2662", 'spades': u"\u2660"}
         self.suitSymbols = {'hearts': "\xE2\x99\xA1", 'clubs': "\xE2\x99\xA7", 'diamonds': "\xE2\x99\xA2", 'spades': "\xE2\x99\xA4"}
-        #Dark versions - 'hearts':u"\u2665", 'diamonds':u"\u2666
         self.cardTypes = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'king', 'queen', 'ace']
         self.cards = []
 
@@ -64,9 +60,9 @@ class PokerGame:
     def hit(self):
         self.draw()
         if self.calchand() < 21:
-            return self.printhand('- Hit or Stand?')
+            self.printhand('- Hit or Stand?')
         else:
-            return self.stand()
+            self.stand()
 
     def stand(self):
         #If player didn't bust or get blackjack, get the dealer some cards
@@ -85,26 +81,26 @@ class PokerGame:
         #If house wins,
         if 22 > self.calchand('house') > self.calchand('player') or self.calchand('player') > 21 or not self.isblackjack() and self.isblackjack('house'):
             _blackjackstats[self.player].losses += 1
-            return self.printhand('- {} loses!'.format(self.player), False)
+            self.printhand('- {} loses!'.format(self.player), False)
         #If it's a tie
         elif self.calchand('player') == self.calchand('house'):
             _blackjackstats[self.player].ties += 1
-            return self.printhand('- {} ties!'.format(self.player), False)
+            self.printhand('- {} ties!'.format(self.player), False)
         #If the player wins
         else:
             _blackjackstats[self.player].wins += 1
-            return self.printhand('- {} wins!'.format(self.player), False)
+            self.printhand('- {} wins!'.format(self.player), False)
 
         self.gameend()
 
     def hand(self):
-        return self.printhand('- Hit or Stand?')
+        self.printhand('- Hit or Stand?')
 
     def printhand(self, message, hidehousehand=True):
-        return '{}: {} ({}) House: {} {}'.format(self.player,
+        say('{}: {} ({}) House: {} {}'.format(self.player,
              ' '.join([self.printcard(card) for card in self.playerHand]),
              'Bust' if self.calchand() > 21 else 'Blackjack' if self.calchand() == 21 and len(self.playerHand) == 2 else self.calchand(),
-             ' '.join([self.printcard(self.houseHand[0]), '?'] if hidehousehand else [self.printcard(card) for card in self.houseHand] + ['({})'.format('Bust' if self.calchand('house') > 21 else 'Blackjack' if self.calchand('house') == 21 and len(self.houseHand) == 2 else self.calchand('house'))]), message)
+             ' '.join([self.printcard(self.houseHand[0]), '?'] if hidehousehand else [self.printcard(card) for card in self.houseHand] + ['({})'.format('Bust' if self.calchand('house') > 21 else 'Blackjack' if self.calchand('house') == 21 and len(self.houseHand) == 2 else self.calchand('house'))]), message))
 
     def calchand(self, person='player'):
         handtotal = 0
@@ -172,7 +168,6 @@ class PokerGame:
         return len(hand) == 2 and self.calchand(person) == 21
 
     def printcard(self, card):
-        #need to somehow add suitSymbols[card[1]]
         return '{}{}'.format(self.suitSymbols[card[1]], card[0] if type(card[0]) == int else card[0][0].title()) #self.suitSymbols[card[0]])
 
     def gameend(self):
@@ -193,7 +188,6 @@ class PokerGame:
 
 
 def blackjack_hit(user, command):
-    context = hexchat.get_context()
     #Add them to the stats collection if they're not already there,
     if user not in _blackjackstats:
         _blackjackstats[user] = BlackjackStatistics(user)
@@ -203,29 +197,27 @@ def blackjack_hit(user, command):
     if not _blackjackstats[user].currenthand:
 
         _blackjackstats[user].currenthand = PokerGame(user)
-        context.command('say ' + _blackjackstats[user].currenthand.blackjackcheck())
+        say(_blackjackstats[user].currenthand.blackjackcheck())
     else:
-        context.command('say ' + _blackjackstats[user].currenthand.hit())
+        say(_blackjackstats[user].currenthand.hit())
 
 
 def blackjack_stand(user, command):
-    context = hexchat.get_context()
     #Add them to the stats collection if they're not already there,
     if user not in _blackjackstats:
         _blackjackstats[user] = BlackjackStatistics(user)
 
     if _blackjackstats[user].currenthand:
-        context.command('say ' + _blackjackstats[user].currenthand.stand())
+        say(_blackjackstats[user].currenthand.stand())
     else:
-        context.command('say ' + "You must start a game first by saying 'hit' before standing!")
+        say("You must start a game first by saying 'hit' before standing!")
 
 
 def blackjack_scores(user, command):
-    context = hexchat.get_context()
     if user in _blackjackstats:
         #Wins: 38 (45.2%); Losses: 46 (54.8%); Blackjacks: 3; Total: 84 (+10 ties)
         totalplays = float(_blackjackstats[user].wins+_blackjackstats[user].losses+_blackjackstats[user].ties)
-        context.command('say ' + "{} - Wins: {} ({:.1f}%); Losses: {} ({:.1f}%); Ties: {} ({:.1f}%)".format(user.title(),
+        say("{} - Wins: {} ({:.1f}%); Losses: {} ({:.1f}%); Ties: {} ({:.1f}%)".format(user.title(),
                                                               _blackjackstats[user].wins,
                                                               _blackjackstats[user].wins/totalplays*100,
                                                               _blackjackstats[user].losses,
@@ -233,7 +225,7 @@ def blackjack_scores(user, command):
                                                               _blackjackstats[user].ties,
                                                               _blackjackstats[user].ties/totalplays*100))
     else:
-        context.command('say ' + "You must play first to have scores!")
+        say("You must play first to have scores!")
 
 
 def savestats(dt):
@@ -245,9 +237,9 @@ def blackjack_dispatch(word, word_eol, userdata):
     try:
         a = word[1].split()
         {
-        ".hit"  : blackjack_hit,
-        ".stand"  : blackjack_stand,
-        ".scores"  : blackjack_scores
+            ".hit"  : blackjack_hit,
+            ".stand"  : blackjack_stand,
+            ".scores"  : blackjack_scores
         }[a[0].lower()](word[0], a[1:])
     except:
         pass
