@@ -30,8 +30,8 @@ def update_count(argv, arg_to_eol, c):
         _channelmessages[channelname] = 0
 
 
-hexchat.hook_print('Channel Msg Hilight', update_count, priority=hexchat.PRI_LOW)
 hexchat.hook_print('Channel Message', update_count, priority=hexchat.PRI_LOW)
-hexchat.hook_print('Focus Tab', update_count, priority=hexchat.PRI_LOW)
+hexchat.hook_print('Channel Msg Hilight', update_count, priority=hexchat.PRI_LOW)
 hexchat.hook_print('Channel Action', update_count, priority=hexchat.PRI_LOW)
 hexchat.hook_print('Channel Action Hilight', update_count, priority=hexchat.PRI_LOW)
+hexchat.hook_print('Focus Tab', update_count)
