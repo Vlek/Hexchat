@@ -16,7 +16,6 @@ def update_count(argv, arg_to_eol, c):
     channelname = channelcontext.get_info('channel').split()[0]
 
     # Add to the message count
-    #print('Currentcontext: {}, channel called in: {}'.format( currentcontextchannel, channelname ))
     if currentcontextchannel != channelname:
         if channelname not in _channelmessages:
             _channelmessages[channelname] = 0
