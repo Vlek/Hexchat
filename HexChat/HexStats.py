@@ -10,7 +10,8 @@ __module_author__ = 'Vlek'
 
 
 def stats(word, word_to_eol, userdata):
-    print( getstats() )
+    context = hexchat.find_context()
+    context.prnt( getstats() )
     return hexchat.EAT_ALL
 
 
@@ -28,7 +29,8 @@ def getstats():
     contextlist = [i.context for i in chans if i.type == 2]
     ops = []
     for context in contextlist:
-        ops += [user.prefix for user in context.get_list('users') if user.nick == hexchat.get_info('nick')]
+        ops += [user.prefix for user in context.get_list('users') if user.nick == context.get_info('nick')]
+        print('Channel: {} - {}'.format(context.get_info('channel'), context.get_info('nick')))
     #ops = ops.count('@')
 
     servers = types.count(1)
