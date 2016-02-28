@@ -30,7 +30,7 @@ def getstats():
     for channel in chans:
         if channel.type == 2:
             context = channel.context
-            ops += [user.prefix for user in context.get_list('users') if user.nick == context.get_info('nick')]
+            ops += [user.prefix for user in context.get_list('users') if hexchat.nickcmp(user.nick, context.get_info('nick')) == 0]
 
     ops = ops.count('@')
 
