@@ -25,15 +25,12 @@ def getstats():
     chans = hexchat.get_list('channels')
     types = [i.type for i in chans]
     channels = types.count(2)
-    
     ops = []
     for channel in chans:
         if channel.type == 2:
             context = channel.context
             ops += [user.prefix for user in context.get_list('users') if hexchat.nickcmp(user.nick, context.get_info('nick')) == 0]
-
     ops = ops.count('@')
-
     servers = types.count(1)
     queries = types.count(3)
     return 'Stats: {} channels ({} OPs), {} servers, {} queries'.format( channels, ops,
