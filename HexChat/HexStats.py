@@ -5,7 +5,7 @@ import hexchat
 
 __module_name__ = 'HexStats'
 __module_version__ = '0.0.1'
-__module_description__ = 'Displays HexChat Wide User Statistics'
+__module_description__ = 'Displays HexChat-wide User Statistics'
 __module_author__ = 'Vlek'
 
 
@@ -26,12 +26,13 @@ def getstats():
     types = [i.type for i in chans]
     channels = types.count(2)
     
-    contextlist = [i.context for i in chans if i.type == 2]
     ops = []
-    for context in contextlist:
-        ops += [user.prefix for user in context.get_list('users') if user.nick == context.get_info('nick')]
-        print('Channel: {} - {}'.format(context.get_info('channel'), context.get_info('nick')))
-    #ops = ops.count('@')
+    for channel in chans:
+        if channel.type == 2:
+            context = channel.context
+            ops += [user.prefix for user in context.get_list('users') if user.nick == context.get_info('nick')]
+
+    ops = ops.count('@')
 
     servers = types.count(1)
     queries = types.count(3)
