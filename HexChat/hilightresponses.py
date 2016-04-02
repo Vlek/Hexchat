@@ -11,7 +11,8 @@ def check_for_highlight(word, word_to_eol, userdata):
     global _lastresponder
     context = hexchat.get_context()
     channelname = context.get_info('channel')
-    if channelname in _lastresponder and _lastresponder[channelname] == hexchat.get_info('nick'):
+    windowname = hexchat.find_context().get_info('channel')
+    if channelname in _lastresponder and _lastresponder[channelname] == hexchat.get_info('nick') and windowname != channelname:
         if len(word) == 2:
             word.append('')
         hexchat.emit_print('Channel Msg Hilight', word[0], word[1], word[2])
