@@ -9,8 +9,7 @@ _lastresponder = {}
 
 def check_for_highlight(word, word_to_eol, userdata):
     global _lastresponder
-    context = hexchat.get_context()
-    channelname = context.get_info('channel')
+    channelname = hexchat.get_context().get_info('channel')
     windowname = hexchat.find_context().get_info('channel')
     if channelname in _lastresponder and _lastresponder[channelname] == hexchat.get_info('nick') and windowname != channelname:
         if len(word) == 2:
@@ -20,13 +19,10 @@ def check_for_highlight(word, word_to_eol, userdata):
     update_responder(word, word_to_eol, userdata)
     return hexchat.EAT_NONE
 
-
 def update_responder(word, word_to_eol, userdata):
     global _lastresponder
-    context = hexchat.get_context()
-    _lastresponder[context.get_info('channel')] = word[0]
+    _lastresponder[hexchat.get_context().get_info('channel')] = word[0]
     return hexchat.EAT_NONE
-
 
 hexchat.hook_print('Channel Message', check_for_highlight, priority=hexchat.PRI_LOW)
 hexchat.hook_print('Your Message', update_responder, priority=hexchat.PRI_LOW)
