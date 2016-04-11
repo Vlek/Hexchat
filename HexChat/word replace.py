@@ -2,7 +2,7 @@ import hexchat
 
 __module_name__ = 'Word Replace'
 __module_version__ = '0.0.1'
-__module_description__ = 'Replaces words with preferred ones'
+__module_description__ = 'Replaces words with others'
 __module_author__ = 'Vlek'
 
 """
@@ -20,7 +20,8 @@ def check_for_replacements(word, word_to_eol, userdata):
     result = []
     changed = False
     for w in word[1].split():
-        if w.lower() in _replacements.keys():
+        w = w.lower()
+        if w in _replacements.keys():
             result.append(_replacements[w])
             changed = True
         else:
